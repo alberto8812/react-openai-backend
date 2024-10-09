@@ -34,6 +34,7 @@ export class OpenaiService {
             temperature: 0.5,
             max_tokens: 150,
         });
+
         const jsonResult = JSON.parse(completion.choices[0].message.content); // convierte el resultado en un json
         return jsonResult;
 

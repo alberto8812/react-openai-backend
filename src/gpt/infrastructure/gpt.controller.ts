@@ -1,6 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { GptService } from '../aplication/gpt.service';
-import { OrtographyCheckDto } from './dto';
+import { OrtographyCheckDto, ProsConsDiscusserDto } from './dto';
+import { Response } from 'express';
 
 @Controller('gpt')
 export class GptController {
@@ -10,5 +11,20 @@ export class GptController {
     @Body() ortographyCheckDto: OrtographyCheckDto,
   ) {
     return await this.gptService.ortographyCheck(ortographyCheckDto);
+  }
+  @Post('pros-cons-discusser')
+  async prosConsDicusser(
+    @Body() prosConsDiscusserDto: ProsConsDiscusserDto,
+    @Res() res: Response,
+  ) {
+    const stream = await this.gptService.prosConsDicusser(prosConsDiscusserDto);
+    res.setHeader('Content-Type', 'application/json');
+    res.status(HttpStatus.OK)
+    //son muchas emisiones de datos por eso se usa el for await
+    for await (const chunk of stream) {
+      const pice = chunk.choices[0].delta.content || '';
+      res.write(pice);
+    }
+    res.end();
   }
 }
