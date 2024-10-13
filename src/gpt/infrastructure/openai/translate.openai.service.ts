@@ -3,14 +3,20 @@ import OpenAI from "openai";
 
 
 @Injectable()
-export class ProConsDisCusseOpenaiService {
+export class TranslateOpenaiService {
 
     private readonly openai: OpenAI;
     constructor() {
         this.openai = new OpenAI({ apiKey: process.env.OPEN_API_KEY });
     }
 
-    async createCompletion(message: string): Promise<any> {
+    /**
+     * mwetodo que traduce un texto a un idioma especifico
+     * @param message 
+     * @param lang 
+     * @returns 
+     */
+    async createCompletion(message: string, lang: string): Promise<any> {
         return await this.openai.chat.completions.create({
             stream: true,
             model: "gpt-4o-mini",
@@ -18,11 +24,7 @@ export class ProConsDisCusseOpenaiService {
                 //configuracion de la conversacion   el rol del sistema es el bot y el rol del usuario es el usuario
                 {
                     role: "system",
-                    content: `
-                    Se te dará una pregunta y tu tarea es dar una respuesta con pros y contras,
-                    la respuesta debe de ser en formato markdown,
-                    los pros y contras deben de estar en una lista,
-                    `
+                    content: `Traduce el siguiente texto al idioma ${lang}:${message}`
                 },
                 {
                     role: "user",
