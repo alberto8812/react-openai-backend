@@ -31,8 +31,7 @@ export class TranslateOpenaiService {
                     content: message,
                 },
             ],
-            temperature: 0.5,
-            max_tokens: 500,
+            temperature: 0.2,
         });
     }
 }
