@@ -5,6 +5,9 @@
 
 .env
 
+#Exlode genereted content
+/generated/*
+!/generated/.gitkeep
 # Logs
 logs
 *.log

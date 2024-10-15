@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ortographyCheckUseCase } from './use-cases';
-import { OrtographyCheckDto, ProsConsDiscusserDto, TranlationDto } from '../infrastructure/dto';
+import { OrtographyCheckDto, ProsConsDiscusserDto, TextToAudioDto, TranlationDto } from '../infrastructure/dto';
 //import { OpenAiModule } from '../infrastructure/openai/openai.module';
 import { OpenaiService } from '../infrastructure/openai/openai.service';
-import { ProConsDisCusseOpenaiService, TranslateOpenaiService } from '../infrastructure/openai';
+import { ProConsDisCusseOpenaiService, TextToAudioOpenaiService, TranslateOpenaiService } from '../infrastructure/openai';
+import * as path from 'path';
+import * as fs from 'fs';
+
 
 
 @Injectable()
@@ -11,7 +14,8 @@ export class GptService {
     constructor(
         private readonly openaiService: OpenaiService,
         private readonly proConsDisCusseOpenaiService: ProConsDisCusseOpenaiService,
-        private readonly translateOpenaiService: TranslateOpenaiService
+        private readonly translateOpenaiService: TranslateOpenaiService,
+        private readonly textToAudioOpenaiService: TextToAudioOpenaiService
     ) { }
     async ortographyCheck(ortographyCheckDto: OrtographyCheckDto) {
         return await this.openaiService.createCompletion(ortographyCheckDto.prompt);
@@ -21,6 +25,19 @@ export class GptService {
     }
     async translateUseCase(tranlationDto: TranlationDto) {
         return await this.translateOpenaiService.createCompletion(tranlationDto.prompt, tranlationDto.leng);
+    }
+    async textoToAudio(textToAudioDto: TextToAudioDto,) {
+        return await this.textToAudioOpenaiService.createCompletion(textToAudioDto.prompt, textToAudioDto.voice ?? 'nova');
+    }
+
+    async textoToAudioGetter(Fileid: string,) {
+        const filePath = path.resolve(__dirname, `../../../generated/audios/`, `${Fileid}.mp3`);
+        const wasFound = fs.existsSync(filePath);
+        console.log(wasFound, "filePath");
+        if (!wasFound) new NotFoundException(`El archivo ${Fileid}.mp3 no existe en la carpeta generada.`);
+
+        return filePath;
+
     }
 }
 
